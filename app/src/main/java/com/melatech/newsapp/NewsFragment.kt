@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 
 class NewsFragment : Fragment() {
 
@@ -13,7 +14,8 @@ class NewsFragment : Fragment() {
         fun newInstance() = NewsFragment()
     }
 
-    private lateinit var viewModel: NewsViewModel
+    private val newsViewModel by viewModels<NewsViewModel>()
+    // private val exampleViewModel: NewsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,7 +26,6 @@ class NewsFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this)[NewsViewModel::class.java]
         // TODO: Use the ViewModel
     }
 

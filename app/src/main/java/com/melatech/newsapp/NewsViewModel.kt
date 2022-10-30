@@ -1,7 +1,10 @@
 package com.melatech.newsapp
 
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class NewsViewModel : ViewModel() {
+@HiltViewModel
+class NewsViewModel @Inject constructor() : ViewModel() {
     // TODO: Implement the ViewModel
 }
