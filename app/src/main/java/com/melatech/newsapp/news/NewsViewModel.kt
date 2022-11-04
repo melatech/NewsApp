@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
 class NewsViewModel @Inject constructor(
     private val repository: INewsRepository
@@ -20,9 +21,16 @@ class NewsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val response = repository.getNewsHeadlines("us", 1)
+            val response = repository.getNewsHeadlines(COUNTRY_NAME, PAGE)
             val newsHeadlines = response.body()
             newsHeadlines?.let { _newsUiState.value = listOf(it) }
         }
     }
+
+    companion object {
+        private val COUNTRY_NAME = "us"
+        private val PAGE = 1
+    }
 }
+
+object MyClass
