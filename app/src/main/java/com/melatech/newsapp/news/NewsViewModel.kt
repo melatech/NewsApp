@@ -32,5 +32,3 @@ class NewsViewModel @Inject constructor(
         private val PAGE = 1
     }
 }
-
-object MyClass
