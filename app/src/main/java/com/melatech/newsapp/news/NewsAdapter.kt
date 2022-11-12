@@ -9,14 +9,30 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.melatech.newsapp.R
 import com.melatech.newsapp.data.source.remote.model.Article
+import java.text.SimpleDateFormat
+import java.util.*
 
 class NewsAdapter : ListAdapter<Article, NewsAdapter.NewsViewHolder>(NewsDiffCallback) {
 
     class NewsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val newsItem: TextView = itemView.findViewById(R.id.newsItem)
+        private val news_title: TextView = itemView.findViewById(R.id.news_title)
+        private val news_description: TextView = itemView.findViewById(R.id.news_description)
+        private val news_author: TextView = itemView.findViewById(R.id.news_author)
+        private val news_date: TextView = itemView.findViewById(R.id.news_date)
 
         fun bind(article: Article) {
-            newsItem.text = article.author ?: "Unknown"
+            news_title.text = article.title
+            news_description.text = article.description
+            news_author.text = article.author ?: "-"
+
+            article.publishedAt?.apply {
+                val formatter = SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'", Locale.getDefault())
+                val d = formatter.parse(this)
+                news_date.text = d?.let {
+                    val f = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+                    f.format(d)
+                } ?: "-"
+            }
         }
     }
 
