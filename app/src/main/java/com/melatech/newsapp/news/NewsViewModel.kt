@@ -27,15 +27,15 @@ class NewsViewModel @Inject constructor(
             val newsHeadlines = response.body()
             newsHeadlines?.run {
                 val articleUIModelList = this.articles
-                    .map {
+                    .map { article ->
                         ArticleUIModel(
-                            id = it.id ?: 0,
-                            title = it.title ?: "-",
-                            description = it.description ?: "-",
-                            formattedPublishedDate = it.publishedAt?.let { publishedDate ->
+                            id = article.id ?: 0,
+                            title = article.title ?: "-",
+                            description = article.description ?: "-",
+                            formattedPublishedDate = article.publishedAt?.let { publishedDate ->
                                 formatPublishedDateUsecase.format(publishedDate)
                             } ?: "-",
-                            authorName = it.author ?: "-"
+                            authorName = article.author ?: "-"
                         )
                     }
                 _newsUiState.value = articleUIModelList
