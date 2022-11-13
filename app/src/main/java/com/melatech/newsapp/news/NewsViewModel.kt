@@ -3,7 +3,8 @@ package com.melatech.newsapp.news
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.melatech.newsapp.data.source.INewsRepository
-import com.melatech.newsapp.data.source.remote.model.Article
+import com.melatech.newsapp.domain.usecase.FormatPublishedDateUsecase
+import com.melatech.newsapp.news.model.ArticleUIModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,17 +14,32 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NewsViewModel @Inject constructor(
-    private val repository: INewsRepository
+    private val repository: INewsRepository,
+    private val formatPublishedDateUsecase: FormatPublishedDateUsecase
 ) : ViewModel() {
 
-    private val _newsUiState: MutableStateFlow<List<Article>> = MutableStateFlow(emptyList())
-    val newsUiState: StateFlow<List<Article>> = _newsUiState
+    private val _newsUiState: MutableStateFlow<List<ArticleUIModel>> = MutableStateFlow(emptyList())
+    val newsUiState: StateFlow<List<ArticleUIModel>> = _newsUiState
 
     init {
         viewModelScope.launch {
             val response = repository.getNewsHeadlines(COUNTRY_NAME, PAGE)
             val newsHeadlines = response.body()
-            newsHeadlines?.let { _newsUiState.value = it.articles }
+            newsHeadlines?.run {
+                val articleUIModelList = this.articles
+                    .map {
+                        ArticleUIModel(
+                            id = it.id ?: 0,
+                            title = it.title ?: "-",
+                            description = it.description ?: "-",
+                            formattedPublishedDate = it.publishedAt?.let { publishedDate ->
+                                formatPublishedDateUsecase.format(publishedDate)
+                            } ?: "-",
+                            authorName = it.author ?: "-"
+                        )
+                    }
+                _newsUiState.value = articleUIModelList
+            }
         }
     }
 

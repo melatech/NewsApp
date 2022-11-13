@@ -9,10 +9,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.melatech.newsapp.R
 import com.melatech.newsapp.data.source.remote.model.Article
+import com.melatech.newsapp.news.model.ArticleUIModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NewsAdapter : ListAdapter<Article, NewsAdapter.NewsViewHolder>(NewsDiffCallback) {
+class NewsAdapter : ListAdapter<ArticleUIModel, NewsAdapter.NewsViewHolder>(NewsDiffCallback) {
 
     class NewsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val news_title: TextView = itemView.findViewById(R.id.news_title)
@@ -20,19 +21,11 @@ class NewsAdapter : ListAdapter<Article, NewsAdapter.NewsViewHolder>(NewsDiffCal
         private val news_author: TextView = itemView.findViewById(R.id.news_author)
         private val news_date: TextView = itemView.findViewById(R.id.news_date)
 
-        fun bind(article: Article) {
-            news_title.text = article.title
-            news_description.text = article.description
-            news_author.text = article.author ?: "-"
-
-            article.publishedAt?.apply {
-                val formatter = SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'", Locale.getDefault())
-                val d = formatter.parse(this)
-                news_date.text = d?.let {
-                    val f = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-                    f.format(d)
-                } ?: "-"
-            }
+        fun bind(articleUIModel: ArticleUIModel) {
+            news_title.text = articleUIModel.title
+            news_description.text = articleUIModel.description
+            news_author.text = articleUIModel.authorName
+            news_date.text = articleUIModel.formattedPublishedDate
         }
     }
 
@@ -48,12 +41,12 @@ class NewsAdapter : ListAdapter<Article, NewsAdapter.NewsViewHolder>(NewsDiffCal
     }
 }
 
-object NewsDiffCallback : DiffUtil.ItemCallback<Article>() {
-    override fun areItemsTheSame(oldItem: Article, newItem: Article): Boolean {
+object NewsDiffCallback : DiffUtil.ItemCallback<ArticleUIModel>() {
+    override fun areItemsTheSame(oldItem: ArticleUIModel, newItem: ArticleUIModel): Boolean {
         return oldItem == newItem
     }
 
-    override fun areContentsTheSame(oldItem: Article, newItem: Article): Boolean {
+    override fun areContentsTheSame(oldItem: ArticleUIModel, newItem: ArticleUIModel): Boolean {
         return oldItem.id == newItem.id
     }
 }
