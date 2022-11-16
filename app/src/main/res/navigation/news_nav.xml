@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/news_nav"
+    app:startDestination="@id/newsFragment">
+
+    <fragment
+        android:id="@+id/newsFragment"
+        android:name="com.melatech.newsapp.news.NewsFragment"
+        android:label="fragment_news"
+        tools:layout="@layout/fragment_news" >
+        <action
+            android:id="@+id/navigateToNewsDetailsFragment"
+            app:destination="@id/newsDetailsFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/newsDetailsFragment"
+        android:name="com.melatech.newsapp.NewsDetailsFragment"
+        android:label="fragment_news_details"
+        tools:layout="@layout/fragment_news_details" >
+        <action
+            android:id="@+id/navigateToNewsFragment"
+            app:destination="@id/newsFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right" />
+    </fragment>
+</navigation>

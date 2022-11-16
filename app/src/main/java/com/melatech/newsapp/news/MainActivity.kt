@@ -1,9 +1,8 @@
 package com.melatech.newsapp.news
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.activity.viewModels
-import androidx.fragment.app.activityViewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
 import com.melatech.newsapp.R
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -14,11 +13,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (savedInstanceState == null) {
-            supportFragmentManager
-                .beginTransaction()
-                .add(R.id.fragment_container, NewsFragment.newInstance(), "news_fragment")
-                .commit()
-        }
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+        val navController = navHostFragment.navController
+        navController
+            .setGraph(R.navigation.news_nav, intent.extras)
     }
 }

@@ -8,12 +8,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.melatech.newsapp.R
-import com.melatech.newsapp.data.source.remote.model.Article
 import com.melatech.newsapp.news.model.ArticleUIModel
-import java.text.SimpleDateFormat
-import java.util.*
 
-class NewsAdapter : ListAdapter<ArticleUIModel, NewsAdapter.NewsViewHolder>(NewsDiffCallback) {
+class NewsAdapter(val onItemClick: () -> Unit) :
+    ListAdapter<ArticleUIModel, NewsAdapter.NewsViewHolder>(NewsDiffCallback) {
 
     class NewsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val news_title: TextView = itemView.findViewById(R.id.news_title)
@@ -38,6 +36,7 @@ class NewsAdapter : ListAdapter<ArticleUIModel, NewsAdapter.NewsViewHolder>(News
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         val news = getItem(position)
         holder.bind(news)
+        holder.itemView.setOnClickListener { onItemClick() }
     }
 }
 

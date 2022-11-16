@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.melatech.newsapp.R
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,7 +32,7 @@ class NewsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        newsAdapter = NewsAdapter()
+        newsAdapter = NewsAdapter { navigateToDetailsScreen(view) }
         val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
         recyclerView.adapter = newsAdapter
     }
@@ -39,6 +40,10 @@ class NewsFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         getNewsHeadlines()
+    }
+
+    private fun navigateToDetailsScreen(view: View) {
+        Navigation.findNavController(view).navigate(R.id.navigateToNewsDetailsFragment)
     }
 
     private fun getNewsHeadlines() {
