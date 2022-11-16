@@ -15,11 +15,15 @@ class FormatPublishedDateUsecase @Inject constructor(
     private val zoneId: ZoneId,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) {
-    suspend fun format(publishedDate: String): String {
+    private suspend fun format(publishedDate: String): String {
         return withContext(defaultDispatcher) {
             val timestampInstant = Instant.parse(publishedDate)
             val articlePublishedZonedTime = ZonedDateTime.ofInstant(timestampInstant, zoneId)
             articlePublishedZonedTime.format(dateTimeFormatter)
         }
+    }
+
+    suspend operator fun invoke(publishedDate: String): String {
+        return format(publishedDate)
     }
 }

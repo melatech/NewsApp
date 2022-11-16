@@ -18,7 +18,7 @@ class FormatPublishedDateUsecaseTest {
     @Test
     fun testFormatPublishedDate() {
         runBlocking {
-            val formattedDate = formatPublishedDateUsecase.format("2022-11-13T12:00:42Z")
+            val formattedDate = formatPublishedDateUsecase("2022-11-13T12:00:42Z")
             assertEquals("Nov 13, 2022, 12:00:42 PM", formattedDate)
         }
     }

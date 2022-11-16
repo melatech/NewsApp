@@ -33,7 +33,7 @@ class NewsViewModel @Inject constructor(
                             title = article.title ?: "-",
                             description = article.description ?: "-",
                             formattedPublishedDate = article.publishedAt?.let { publishedDate ->
-                                formatPublishedDateUsecase.format(publishedDate)
+                                formatPublishedDateUsecase(publishedDate)
                             } ?: "-",
                             authorName = article.author ?: "-"
                         )
