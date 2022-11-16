@@ -1,5 +1,9 @@
 package com.melatech.newsapp.domain.usecase
 
+import com.melatech.newsapp.di.DefaultDispatcher
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -8,12 +12,14 @@ import javax.inject.Inject
 
 class FormatPublishedDateUsecase @Inject constructor(
     private val dateTimeFormatter: DateTimeFormatter,
-    private val zoneId: ZoneId
+    private val zoneId: ZoneId,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) {
-    fun format(publishedDate: String): String {
-        val timestampInstant = Instant.parse(publishedDate)
-        val articlePublishedZonedTime =
-            ZonedDateTime.ofInstant(timestampInstant, zoneId)
-        return articlePublishedZonedTime.format(dateTimeFormatter)
+    suspend fun format(publishedDate: String): String {
+        return withContext(defaultDispatcher) {
+            val timestampInstant = Instant.parse(publishedDate)
+            val articlePublishedZonedTime = ZonedDateTime.ofInstant(timestampInstant, zoneId)
+            articlePublishedZonedTime.format(dateTimeFormatter)
+        }
     }
 }
