@@ -1,5 +1,6 @@
 package com.melatech.newsapp.domain.usecase
 
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.time.ZoneId
@@ -16,7 +17,9 @@ class FormatPublishedDateUsecaseTest {
 
     @Test
     fun testFormatPublishedDate() {
-        val formattedDate = formatPublishedDateUsecase.format("2022-11-13T12:00:42Z")
-        assertEquals("Nov 13, 2022, 12:00:42 PM", formattedDate)
+        runBlocking {
+            val formattedDate = formatPublishedDateUsecase.format("2022-11-13T12:00:42Z")
+            assertEquals("Nov 13, 2022, 12:00:42 PM", formattedDate)
+        }
     }
 }
