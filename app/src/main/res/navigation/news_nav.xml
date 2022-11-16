@@ -18,7 +18,7 @@
     </fragment>
     <fragment
         android:id="@+id/newsDetailsFragment"
-        android:name="com.melatech.newsapp.NewsDetailsFragment"
+        android:name="com.melatech.newsapp.news.NewsDetailsFragment"
         android:label="fragment_news_details"
         tools:layout="@layout/fragment_news_details" >
         <action
