@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -15,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.melatech.newsapp.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+
+const val CONTENT_URL_KEY: String = "CONTENT_URL_KEY"
 
 @AndroidEntryPoint
 class NewsFragment : Fragment() {
@@ -32,7 +35,7 @@ class NewsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        newsAdapter = NewsAdapter { navigateToDetailsScreen(view) }
+        newsAdapter = NewsAdapter { url: String -> navigateToDetailsScreen(view, url) }
         val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
         recyclerView.adapter = newsAdapter
     }
@@ -42,8 +45,9 @@ class NewsFragment : Fragment() {
         getNewsHeadlines()
     }
 
-    private fun navigateToDetailsScreen(view: View) {
-        Navigation.findNavController(view).navigate(R.id.navigateToNewsDetailsFragment)
+    private fun navigateToDetailsScreen(view: View, url: String) {
+        val bundle = bundleOf(CONTENT_URL_KEY to url)
+        Navigation.findNavController(view).navigate(R.id.navigateToNewsDetailsFragment, bundle)
     }
 
     private fun getNewsHeadlines() {
@@ -56,9 +60,5 @@ class NewsFragment : Fragment() {
                 }
             }
         }
-    }
-
-    companion object {
-        fun newInstance() = NewsFragment()
     }
 }

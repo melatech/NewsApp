@@ -35,7 +35,8 @@ class NewsViewModel @Inject constructor(
                             formattedPublishedDate = article.publishedAt?.let { publishedDate ->
                                 formatPublishedDateUsecase(publishedDate)
                             } ?: "-",
-                            authorName = article.author ?: "-"
+                            authorName = article.author ?: "-",
+                            contentUrl = article.url
                         )
                     }
                 _newsUiState.value = articleUIModelList
