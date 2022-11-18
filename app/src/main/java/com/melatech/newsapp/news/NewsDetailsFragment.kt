@@ -28,13 +28,6 @@ class NewsDetailsFragment : Fragment() {
         val news_details_progressBar = view.findViewById<ProgressBar>(R.id.news_details_progressBar)
         news_details_webview.apply {
             webViewClient = object : WebViewClient() {
-                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                    super.onPageStarted(view, url, favicon)
-                }
-                override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                    view.loadUrl(url)
-                    return false
-                }
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
                     news_details_progressBar.visibility = View.GONE
