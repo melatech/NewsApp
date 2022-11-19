@@ -35,7 +35,7 @@ class NewsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        newsAdapter = NewsAdapter { url: String -> navigateToDetailsScreen(view, url) }
+        newsAdapter = NewsAdapter { navigateToContent(view) }
         val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
         recyclerView.adapter = newsAdapter
     }
@@ -45,8 +45,8 @@ class NewsFragment : Fragment() {
         getNewsHeadlines()
     }
 
-    private fun navigateToDetailsScreen(view: View, url: String) {
-        val bundle = bundleOf(CONTENT_URL_KEY to url)
+    private fun ContentUrl.navigateToContent(view: View) {
+        val bundle = bundleOf(CONTENT_URL_KEY to this)
         Navigation.findNavController(view).navigate(R.id.navigateToNewsDetailsFragment, bundle)
     }
 

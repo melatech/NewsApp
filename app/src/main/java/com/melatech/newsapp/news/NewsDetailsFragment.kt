@@ -10,6 +10,7 @@ import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import com.melatech.newsapp.R
 
+typealias ContentUrl = String
 
 class NewsDetailsFragment : Fragment() {
 
@@ -27,7 +28,7 @@ class NewsDetailsFragment : Fragment() {
         val news_details_progressBar = view.findViewById<ProgressBar>(R.id.news_details_progressBar)
         news_details_webview.apply {
             webViewClient = object : WebViewClient() {
-                override fun onPageFinished(view: WebView?, url: String?) {
+                override fun onPageFinished(view: WebView?, url: ContentUrl?) {
                     super.onPageFinished(view, url)
                     news_details_progressBar.visibility = View.GONE
                 }

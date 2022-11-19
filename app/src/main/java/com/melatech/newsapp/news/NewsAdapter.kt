@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.melatech.newsapp.R
 import com.melatech.newsapp.news.model.ArticleUIModel
 
-class NewsAdapter(val onItemClick: (url: String) -> Unit) :
+class NewsAdapter(val onContentUrlClick: ContentUrl.() -> Unit) :
     ListAdapter<ArticleUIModel, NewsAdapter.NewsViewHolder>(NewsDiffCallback) {
 
     class NewsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -37,7 +37,7 @@ class NewsAdapter(val onItemClick: (url: String) -> Unit) :
         val articleUIModel = getItem(position)
         holder.bind(articleUIModel)
         articleUIModel.contentUrl?.run {
-            holder.itemView.setOnClickListener { onItemClick(this) } }
+            holder.itemView.setOnClickListener { this.onContentUrlClick() } }
     }
 }
 
