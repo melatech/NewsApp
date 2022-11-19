@@ -14,6 +14,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.melatech.newsapp.R
+import com.melatech.newsapp.news.model.ContentUrl
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

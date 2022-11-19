@@ -6,5 +6,7 @@ data class ArticleUIModel(
     val description: String,
     val formattedPublishedDate: String,
     val authorName: String,
-    val contentUrl: String?
+    val contentUrl: ContentUrl?
 )
+
+typealias ContentUrl = String
