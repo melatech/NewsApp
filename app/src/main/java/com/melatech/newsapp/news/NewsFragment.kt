@@ -54,9 +54,9 @@ class NewsFragment : Fragment() {
     private fun getNewsHeadlines() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                newsViewModel.newsUiState.collect { uiState ->
-                    if (uiState.isNotEmpty()) {
-                        newsAdapter.submitList(uiState)
+                newsViewModel.newsUiStateFlow.collect { articleUiModelList ->
+                    if (articleUiModelList.isNotEmpty()) {
+                        newsAdapter.submitList(articleUiModelList)
                     }
                 }
             }

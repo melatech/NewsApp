@@ -18,8 +18,8 @@ class NewsViewModel @Inject constructor(
     private val formatPublishedDateUsecase: FormatPublishedDateUsecase
 ) : ViewModel() {
 
-    private val _newsUiState: MutableStateFlow<List<ArticleUIModel>> = MutableStateFlow(emptyList())
-    val newsUiState: StateFlow<List<ArticleUIModel>> = _newsUiState
+    private val _newsUiStateFlow: MutableStateFlow<List<ArticleUIModel>> = MutableStateFlow(emptyList())
+    val newsUiStateFlow: StateFlow<List<ArticleUIModel>> = _newsUiStateFlow
 
     init {
         viewModelScope.launch {
@@ -39,7 +39,7 @@ class NewsViewModel @Inject constructor(
                             contentUrl = article.url
                         )
                     }
-                _newsUiState.value = articleUIModelList
+                _newsUiStateFlow.value = articleUIModelList
             }
         }
     }
