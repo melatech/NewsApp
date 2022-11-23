@@ -10,7 +10,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
-class FormatPublishedDateUsecase @Inject constructor(
+class FormatPublishedDateUseCase @Inject constructor(
     private val dateTimeFormatter: DateTimeFormatter,
     private val zoneId: ZoneId,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default,

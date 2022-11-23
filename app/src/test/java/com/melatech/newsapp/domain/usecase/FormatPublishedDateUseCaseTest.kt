@@ -8,9 +8,9 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.*
 
-class FormatPublishedDateUsecaseTest {
+class FormatPublishedDateUseCaseTest {
 
-    private val formatPublishedDateUsecase = FormatPublishedDateUsecase(
+    private val formatPublishedDateUsecase = FormatPublishedDateUseCase(
         dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(Locale.ENGLISH),
         zoneId = ZoneId.of("Europe/London")
     )
