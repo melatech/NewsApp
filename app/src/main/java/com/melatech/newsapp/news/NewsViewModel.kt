@@ -28,7 +28,7 @@ class NewsViewModel @Inject constructor(
         viewModelScope.launch {
             getConnectionUpdateStatusUseCase.networkStatusFlow
                 .distinctUntilChanged()
-                .collect { networkStatus ->
+                .collectLatest { networkStatus ->
                     when (networkStatus) {
                         NetworkStatus.Available -> getNewsHeadlines()
                         NetworkStatus.Unavailable ->
