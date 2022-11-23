@@ -11,10 +11,11 @@
         android:id="@+id/error_icon"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:tintMode="multiply"
         android:layout_gravity="center"
         android:src="@drawable/ic_no_wifi_24dp"
         tools:visibility="visible"
+        app:tint="?colorPrimary"
+        android:tintMode="multiply"
         android:contentDescription="image" />
 
     <TextView
