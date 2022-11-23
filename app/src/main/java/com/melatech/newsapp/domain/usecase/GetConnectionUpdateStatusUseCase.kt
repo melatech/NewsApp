@@ -3,6 +3,7 @@ package com.melatech.newsapp.domain.usecase
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
+import android.net.NetworkCapabilities
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -14,6 +15,22 @@ class GetConnectionUpdateStatusUseCase @Inject constructor(@ApplicationContext c
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
     val networkStatusFlow = callbackFlow {
+
+        // check the capability on the current network
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        capabilities?.run {
+            if (hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+            ) {
+                trySend(NetworkStatus.Available).isSuccess
+            } else {
+                trySend(NetworkStatus.Unavailable).isSuccess
+            }
+        } ?: trySend(NetworkStatus.Unavailable).isSuccess
+
+        // check for network status update
         val networkStatusCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onUnavailable() {
                 trySend(NetworkStatus.Unavailable).isSuccess

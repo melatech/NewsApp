@@ -4,10 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.core.os.bundleOf
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -16,7 +14,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.melatech.newsapp.R
-import com.melatech.newsapp.domain.usecase.NetworkStatus
+import com.melatech.newsapp.news.ErrorType.GENERIC_ERROR
+import com.melatech.newsapp.news.ErrorType.NETWORK_ERROR
 import com.melatech.newsapp.news.model.ContentUrl
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -50,22 +49,21 @@ class NewsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    newsViewModel.newsUiStateFlow.collect { articleUiModelList ->
-                        if (articleUiModelList.isNotEmpty()) {
-                            newsAdapter.submitList(articleUiModelList)
-                        }
-                    }
-                }
-                launch {
-                    newsViewModel.networkStatusFlow.collect { networkStatus ->
-                        when (networkStatus) {
-                            NetworkStatus.Available -> {
+                    newsViewModel.newsUiStateFlow.collect { newsUiState ->
+                        when (newsUiState) {
+                            is NewsUiState.Data -> {
                                 noConnectionView.visibility = View.GONE
                                 newsListView.visibility = View.VISIBLE
+                                newsAdapter.submitList(newsUiState.newsList)
                             }
-                            NetworkStatus.Unavailable -> {
-                                noConnectionView.visibility = View.VISIBLE
-                                newsListView.visibility = View.GONE
+                            is NewsUiState.Error -> {
+                                when (newsUiState.errorType) {
+                                    GENERIC_ERROR -> TODO()
+                                    NETWORK_ERROR -> {
+                                        noConnectionView.visibility = View.VISIBLE
+                                        newsListView.visibility = View.GONE
+                                    }
+                                }
                             }
                         }
                     }

@@ -17,40 +17,49 @@ import javax.inject.Inject
 class NewsViewModel @Inject constructor(
     private val repository: INewsRepository,
     private val formatPublishedDateUseCase: FormatPublishedDateUseCase,
-    getConnectionUpdateStatusUseCase: GetConnectionUpdateStatusUseCase,
+    private val getConnectionUpdateStatusUseCase: GetConnectionUpdateStatusUseCase,
 ) : ViewModel() {
 
-    private val _newsUiStateFlow: MutableStateFlow<List<ArticleUIModel>> =
-        MutableStateFlow(emptyList())
-    val newsUiStateFlow: StateFlow<List<ArticleUIModel>> = _newsUiStateFlow
-
-    val networkStatusFlow: Flow<NetworkStatus> = getConnectionUpdateStatusUseCase.networkStatusFlow
+    private val _newsUiStateFlow: MutableStateFlow<NewsUiState> =
+        MutableStateFlow(NewsUiState.Data(emptyList()))
+    val newsUiStateFlow: StateFlow<NewsUiState> = _newsUiStateFlow
 
     init {
         viewModelScope.launch {
-            try {
-                val response = repository.getNewsHeadlines(COUNTRY_NAME, PAGE)
-                val newsHeadlines = response.body()
-                newsHeadlines?.run {
-                    val articleUIModelList = this.articles
-                        .map { article ->
-                            ArticleUIModel(
-                                id = article.id ?: 0,
-                                title = article.title ?: "-",
-                                description = article.description ?: "-",
-                                formattedPublishedDate = article.publishedAt?.let { publishedDate ->
-                                    formatPublishedDateUseCase(publishedDate)
-                                } ?: "-",
-                                authorName = article.author ?: "-",
-                                contentUrl = article.url
-                            )
-                        }
-                    _newsUiStateFlow.value = articleUIModelList
+            getConnectionUpdateStatusUseCase.networkStatusFlow
+                .distinctUntilChanged()
+                .collect { networkStatus ->
+                    when (networkStatus) {
+                        NetworkStatus.Available -> getNewsHeadlines()
+                        NetworkStatus.Unavailable ->
+                            _newsUiStateFlow.value = NewsUiState.Error(ErrorType.NETWORK_ERROR)
+                    }
                 }
-            } catch (e: Exception) {
-                println("thiru error - $e")
-            }
+        }
+    }
 
+    private suspend fun getNewsHeadlines() {
+        try {
+            val response = repository.getNewsHeadlines(COUNTRY_NAME, PAGE)
+            val newsHeadlines = response.body()
+            newsHeadlines?.run {
+                val articleUIModelList = this.articles
+                    .map { article ->
+                        ArticleUIModel(
+                            id = article.id ?: 0,
+                            title = article.title ?: "-",
+                            description = article.description ?: "-",
+                            formattedPublishedDate = article.publishedAt?.let { publishedDate ->
+                                formatPublishedDateUseCase(publishedDate)
+                            } ?: "-",
+                            authorName = article.author ?: "-",
+                            contentUrl = article.url
+                        )
+                    }
+                _newsUiStateFlow.value = NewsUiState.Data(articleUIModelList)
+            }
+        } catch (e: Exception) {
+            _newsUiStateFlow.value = NewsUiState.Error(ErrorType.GENERIC_ERROR)
         }
     }
 
@@ -58,4 +67,13 @@ class NewsViewModel @Inject constructor(
         private const val COUNTRY_NAME = "us"
         private const val PAGE = 1
     }
+}
+
+sealed class NewsUiState {
+    data class Data(val newsList: List<ArticleUIModel>) : NewsUiState()
+    open class Error(val errorType: ErrorType) : NewsUiState()
+}
+
+enum class ErrorType {
+    GENERIC_ERROR, NETWORK_ERROR
 }
