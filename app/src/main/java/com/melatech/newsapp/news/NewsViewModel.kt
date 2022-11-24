@@ -71,7 +71,7 @@ class NewsViewModel @Inject constructor(
 
 sealed class NewsUiState {
     data class Data(val newsList: List<ArticleUIModel>) : NewsUiState()
-    open class Error(val errorType: ErrorType) : NewsUiState()
+    data class Error(val errorType: ErrorType) : NewsUiState()
 }
 
 enum class ErrorType {
