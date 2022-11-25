@@ -21,16 +21,9 @@ object ApiModule {
     @Provides
     @Singleton
     fun provideRetrofit(): Retrofit {
-        val client = OkHttpClient.Builder()
-            .readTimeout(10, TimeUnit.SECONDS)
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .connectionPool(ConnectionPool(0, 5, TimeUnit.MINUTES))
-            .protocols(listOf(Protocol.HTTP_1_1))
-
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(BuildConfig.BASE_URL)
-            .client(client.build())
             .build()
     }
 

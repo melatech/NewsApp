@@ -24,33 +24,28 @@ class GetConnectionUpdateStatusUseCase @Inject constructor(@ApplicationContext c
                 hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
                 hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
             ) {
-                trySend(NetworkStatus.Available).isSuccess
+                trySend(NetworkStatus.Available)
             } else {
-                trySend(NetworkStatus.Unavailable).isSuccess
+                trySend(NetworkStatus.Unavailable)
             }
-        } ?: trySend(NetworkStatus.Unavailable).isSuccess
+        } ?: trySend(NetworkStatus.Unavailable)
 
         // check for network status update
         val networkStatusCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onUnavailable() {
-                trySend(NetworkStatus.Unavailable).isSuccess
+                trySend(NetworkStatus.Unavailable)
             }
 
             override fun onAvailable(network: Network) {
-                trySend(NetworkStatus.Available).isSuccess
+                trySend(NetworkStatus.Available)
             }
 
             override fun onLost(network: Network) {
-                trySend(NetworkStatus.Unavailable).isSuccess
+                trySend(NetworkStatus.Unavailable)
             }
 
             override fun onLosing(network: Network, maxMsToLive: Int) {
-                trySend(NetworkStatus.Unavailable).isSuccess
-            }
-
-            override fun onBlockedStatusChanged(network: Network, blocked: Boolean) {
-                if (blocked) trySend(NetworkStatus.Unavailable).isSuccess
-                else trySend(NetworkStatus.Available).isSuccess
+                trySend(NetworkStatus.Unavailable)
             }
         }
         connectivityManager.registerDefaultNetworkCallback(networkStatusCallback)

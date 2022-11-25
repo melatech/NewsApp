@@ -3,77 +3,87 @@ package com.melatech.newsapp.news
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.melatech.newsapp.data.source.INewsRepository
+import com.melatech.newsapp.data.source.remote.ServerResponse
 import com.melatech.newsapp.domain.usecase.FormatPublishedDateUseCase
 import com.melatech.newsapp.domain.usecase.GetConnectionUpdateStatusUseCase
 import com.melatech.newsapp.domain.usecase.NetworkStatus
 import com.melatech.newsapp.news.model.ArticleUIModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class NewsViewModel @Inject constructor(
-    private val repository: INewsRepository,
+    repository: INewsRepository,
     private val formatPublishedDateUseCase: FormatPublishedDateUseCase,
-    private val getConnectionUpdateStatusUseCase: GetConnectionUpdateStatusUseCase,
+    getConnectionUpdateStatusUseCase: GetConnectionUpdateStatusUseCase,
 ) : ViewModel() {
 
     private val _newsUiStateFlow: MutableStateFlow<NewsUiState> =
         MutableStateFlow(NewsUiState.Data(emptyList()))
     val newsUiStateFlow: StateFlow<NewsUiState> = _newsUiStateFlow
 
+    private val latestNewsDataflow: Flow<NewsUiState> =
+        repository.latestNewsApiResponseFlow
+            .map { serverResponse ->
+                when (serverResponse) {
+                    is ServerResponse.Failure -> throw NewsDataFetchError()
+                    is ServerResponse.Success -> {
+                        val articleUIModelList = serverResponse.articles
+                            .map { article ->
+                                ArticleUIModel(id = article.id ?: 0,
+                                    title = article.title ?: "-",
+                                    description = article.description ?: "-",
+                                    formattedPublishedDate = article.publishedAt?.let { publishedDate ->
+                                        formatPublishedDateUseCase(publishedDate)
+                                    } ?: "-",
+                                    authorName = article.author ?: "-",
+                                    contentUrl = article.url)
+                            }
+                        if (articleUIModelList.isEmpty()) NewsUiState.Error(ErrorType.EMPTY_DATA)
+                        else NewsUiState.Data(articleUIModelList)
+                    }
+                }
+            }
+            .catch { error ->
+                if (error is NewsDataFetchError) emit(NewsUiState.Error(ErrorType.RETRY_GENERIC_ERROR))
+            }
+            .retry { it is NewsDataFetchError }
+            .shareIn(
+                viewModelScope,
+                replay = 1,
+                started = SharingStarted.WhileSubscribed()
+            )
+
     init {
+        _newsUiStateFlow.value = NewsUiState.Loading
         viewModelScope.launch {
             getConnectionUpdateStatusUseCase.networkStatusFlow
                 .distinctUntilChanged()
-                .collectLatest { networkStatus ->
+                .flatMapLatest { networkStatus ->
                     when (networkStatus) {
-                        NetworkStatus.Available -> getNewsHeadlines()
-                        NetworkStatus.Unavailable ->
-                            _newsUiStateFlow.value = NewsUiState.Error(ErrorType.NETWORK_ERROR)
+                        NetworkStatus.Available -> latestNewsDataflow
+                        NetworkStatus.Unavailable -> flow { emit(NewsUiState.Error(ErrorType.NO_NETWORK_ERROR)) }
                     }
                 }
+                .collect { _newsUiStateFlow.value = it }
         }
-    }
-
-    private suspend fun getNewsHeadlines() {
-        try {
-            val response = repository.getNewsHeadlines(COUNTRY_NAME, PAGE)
-            val newsHeadlines = response.body()
-            newsHeadlines?.run {
-                val articleUIModelList = this.articles
-                    .map { article ->
-                        ArticleUIModel(
-                            id = article.id ?: 0,
-                            title = article.title ?: "-",
-                            description = article.description ?: "-",
-                            formattedPublishedDate = article.publishedAt?.let { publishedDate ->
-                                formatPublishedDateUseCase(publishedDate)
-                            } ?: "-",
-                            authorName = article.author ?: "-",
-                            contentUrl = article.url
-                        )
-                    }
-                _newsUiStateFlow.value = NewsUiState.Data(articleUIModelList)
-            }
-        } catch (e: Exception) {
-            _newsUiStateFlow.value = NewsUiState.Error(ErrorType.GENERIC_ERROR)
-        }
-    }
-
-    companion object {
-        private const val COUNTRY_NAME = "us"
-        private const val PAGE = 1
     }
 }
 
 sealed class NewsUiState {
     data class Data(val newsList: List<ArticleUIModel>) : NewsUiState()
+    object Loading : NewsUiState()
     data class Error(val errorType: ErrorType) : NewsUiState()
 }
 
 enum class ErrorType {
-    GENERIC_ERROR, NETWORK_ERROR
+    EMPTY_DATA,
+    NO_NETWORK_ERROR,
+    RETRY_GENERIC_ERROR
 }
+
+private class NewsDataFetchError : Exception()
