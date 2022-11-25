@@ -70,7 +70,8 @@ class NewsFragment : Fragment() {
                                     EMPTY_DATA -> {
                                         newsListProgressBar.visibility = View.GONE
                                         noConnectionView.visibility = View.VISIBLE
-                                        errorIcon.visibility = View.INVISIBLE
+                                        errorIcon.visibility = View.VISIBLE
+                                        errorIcon.setImageResource(R.drawable.no_news)
                                         newsListView.visibility = View.GONE
                                         errorMessage.text = "No News"
                                     }
@@ -78,6 +79,7 @@ class NewsFragment : Fragment() {
                                         newsListProgressBar.visibility = View.GONE
                                         noConnectionView.visibility = View.VISIBLE
                                         errorIcon.visibility = View.VISIBLE
+                                        errorIcon.setImageResource(R.drawable.no_internet)
                                         newsListView.visibility = View.GONE
                                         errorMessage.text = "No Internet Connection"
                                     }

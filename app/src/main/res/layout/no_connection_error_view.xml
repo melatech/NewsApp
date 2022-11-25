@@ -12,10 +12,8 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_gravity="center"
-        android:src="@drawable/ic_no_wifi_24dp"
+        android:src="@drawable/no_internet"
         tools:visibility="visible"
-        app:tint="?colorPrimary"
-        android:tintMode="multiply"
         android:contentDescription="image" />
 
     <TextView

@@ -55,7 +55,7 @@ class NewsViewModel @Inject constructor(
             .shareIn(
                 viewModelScope,
                 replay = 1,
-                started = SharingStarted.WhileSubscribed()
+                started = SharingStarted.Lazily
             )
 
     init {
