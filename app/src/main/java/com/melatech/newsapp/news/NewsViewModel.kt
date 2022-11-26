@@ -3,6 +3,7 @@ package com.melatech.newsapp.news
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.melatech.newsapp.data.source.INewsRepository
+import com.melatech.newsapp.data.source.remote.NewsDataFetchError
 import com.melatech.newsapp.data.source.remote.ServerResponse
 import com.melatech.newsapp.domain.usecase.FormatPublishedDateUseCase
 import com.melatech.newsapp.domain.usecase.GetConnectionUpdateStatusUseCase
@@ -28,9 +29,13 @@ class NewsViewModel @Inject constructor(
 
     private val latestNewsDataflow: Flow<NewsUiState> =
         repository.latestNewsApiResponseFlow
+            .retry {
+                _newsUiStateFlow.value = NewsUiState.Error(ErrorType.RETRY_GENERIC_ERROR)
+                it is NewsDataFetchError
+            }
             .map { serverResponse ->
                 when (serverResponse) {
-                    is ServerResponse.Failure -> throw NewsDataFetchError()
+                    is ServerResponse.NoContent -> NewsUiState.Error(ErrorType.NO_CONTENT)
                     is ServerResponse.Success -> {
                         val articleUIModelList = serverResponse.articles
                             .map { article ->
@@ -43,15 +48,10 @@ class NewsViewModel @Inject constructor(
                                     authorName = article.author ?: "-",
                                     contentUrl = article.url)
                             }
-                        if (articleUIModelList.isEmpty()) NewsUiState.Error(ErrorType.EMPTY_DATA)
-                        else NewsUiState.Data(articleUIModelList)
+                        NewsUiState.Data(articleUIModelList)
                     }
                 }
             }
-            .catch { error ->
-                if (error is NewsDataFetchError) emit(NewsUiState.Error(ErrorType.RETRY_GENERIC_ERROR))
-            }
-            .retry { it is NewsDataFetchError }
             .shareIn(
                 viewModelScope,
                 replay = 1,
@@ -81,9 +81,7 @@ sealed class NewsUiState {
 }
 
 enum class ErrorType {
-    EMPTY_DATA,
+    NO_CONTENT,
     NO_NETWORK_ERROR,
     RETRY_GENERIC_ERROR
 }
-
-private class NewsDataFetchError : Exception()

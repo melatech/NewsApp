@@ -67,7 +67,7 @@ class NewsFragment : Fragment() {
                             }
                             is NewsUiState.Error -> {
                                 when (newsUiState.errorType) {
-                                    EMPTY_DATA -> {
+                                    NO_CONTENT -> {
                                         newsListProgressBar.visibility = View.GONE
                                         noConnectionView.visibility = View.VISIBLE
                                         errorIcon.visibility = View.VISIBLE

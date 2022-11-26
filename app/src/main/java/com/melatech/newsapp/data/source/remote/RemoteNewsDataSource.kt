@@ -27,9 +27,13 @@ class RemoteNewsDataSource @Inject constructor(
                 val latestNewsApiResponse = withContext(ioDispatcher) {
                     newsApi.getTopHeadlines(COUNTRY_NAME, PAGE)
                 }
-                emit(ServerResponse.Success(latestNewsApiResponse.body()?.articles ?: emptyList()))
+                val response = latestNewsApiResponse.body()?.articles?.let {
+                    if (it.isEmpty()) ServerResponse.NoContent
+                    else ServerResponse.Success(it)
+                } ?: ServerResponse.NoContent
+                emit(response)
             } catch (e: Exception) {
-                emit(ServerResponse.Failure(e.toString()))
+                throw NewsDataFetchError(e.toString())
             }
         }.shareIn(
             externalScope,
@@ -44,6 +48,8 @@ class RemoteNewsDataSource @Inject constructor(
 }
 
 sealed class ServerResponse {
-    data class Success(val articles: List<Article> = emptyList()) : ServerResponse()
-    data class Failure(val error: String) : ServerResponse()
+    data class Success(val articles: List<Article>) : ServerResponse()
+    object NoContent : ServerResponse()
 }
+
+class NewsDataFetchError(val error: String) : Exception()
