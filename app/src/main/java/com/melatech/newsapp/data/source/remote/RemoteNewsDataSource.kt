@@ -11,27 +11,25 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class RemoteNewsDataSource @Inject constructor(
     private val newsApi: NewsApi,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
     @ApplicationScope private val externalScope: CoroutineScope,
-    retryPolicy: RetryPolicy
+    retryPolicy: RetryPolicy,
 ) : INewsDataSource {
 
     override val latestNewsApiResponseFlow: Flow<ServerResponse> =
         flow {
-            val latestNewsApiResponse = withContext(ioDispatcher) {
-                newsApi.getTopHeadlines(COUNTRY_NAME, PAGE)
-            }
+            val latestNewsApiResponse = newsApi.getTopHeadlines(COUNTRY_NAME, PAGE)
             val response = latestNewsApiResponse.body()?.articles?.let {
                 if (it.isEmpty()) ServerResponse.NoContent
                 else ServerResponse.Success(it)
             } ?: ServerResponse.NoContent
             emit(response)
         }
+            .flowOn(ioDispatcher)
             .retryWithPolicy(retryPolicy)
             .catch { emit(ServerResponse.Failure(it.message)) }
             .shareIn(
