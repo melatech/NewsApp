@@ -26,6 +26,21 @@ class NewsViewModel @Inject constructor(
         MutableStateFlow(NewsUiState.Data(emptyList()))
     val newsUiStateFlow: StateFlow<NewsUiState> = _newsUiStateFlow
 
+    init {
+        _newsUiStateFlow.value = NewsUiState.Loading
+        viewModelScope.launch {
+            getConnectionUpdateStatusUseCase.networkStatusFlow
+                .distinctUntilChanged()
+                .flatMapLatest { networkStatus ->
+                    when (networkStatus) {
+                        NetworkStatus.Available -> latestNewsDataflow
+                        NetworkStatus.Unavailable -> flow { emit(NewsUiState.Error(ErrorType.NO_NETWORK_ERROR)) }
+                    }
+                }
+                .collect { _newsUiStateFlow.value = it }
+        }
+    }
+
     private val latestNewsDataflow: Flow<NewsUiState> =
         repository.latestNewsApiResponseFlow
             .map { serverResponse ->
@@ -53,21 +68,6 @@ class NewsViewModel @Inject constructor(
                 replay = 1,
                 started = SharingStarted.Lazily
             )
-
-    init {
-        _newsUiStateFlow.value = NewsUiState.Loading
-        viewModelScope.launch {
-            getConnectionUpdateStatusUseCase.networkStatusFlow
-                .distinctUntilChanged()
-                .flatMapLatest { networkStatus ->
-                    when (networkStatus) {
-                        NetworkStatus.Available -> latestNewsDataflow
-                        NetworkStatus.Unavailable -> flow { emit(NewsUiState.Error(ErrorType.NO_NETWORK_ERROR)) }
-                    }
-                }
-                .collect { _newsUiStateFlow.value = it }
-        }
-    }
 }
 
 sealed class NewsUiState {
