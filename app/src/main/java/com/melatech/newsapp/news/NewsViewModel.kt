@@ -3,7 +3,6 @@ package com.melatech.newsapp.news
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.melatech.newsapp.data.source.INewsRepository
-import com.melatech.newsapp.data.source.remote.NewsDataFetchError
 import com.melatech.newsapp.data.source.remote.ServerResponse
 import com.melatech.newsapp.domain.usecase.FormatPublishedDateUseCase
 import com.melatech.newsapp.domain.usecase.GetConnectionUpdateStatusUseCase
@@ -29,10 +28,6 @@ class NewsViewModel @Inject constructor(
 
     private val latestNewsDataflow: Flow<NewsUiState> =
         repository.latestNewsApiResponseFlow
-            .retry {
-                _newsUiStateFlow.value = NewsUiState.Error(ErrorType.RETRY_GENERIC_ERROR)
-                it is NewsDataFetchError
-            }
             .map { serverResponse ->
                 when (serverResponse) {
                     is ServerResponse.NoContent -> NewsUiState.Error(ErrorType.NO_CONTENT)
@@ -50,6 +45,7 @@ class NewsViewModel @Inject constructor(
                             }
                         NewsUiState.Data(articleUIModelList)
                     }
+                    is ServerResponse.Failure -> NewsUiState.Error(ErrorType.RETRY_GENERIC_ERROR)
                 }
             }
             .shareIn(

@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -84,11 +85,19 @@ class NewsFragment : Fragment() {
                                         errorMessage.text = "No Internet Connection"
                                     }
                                     RETRY_GENERIC_ERROR -> {
-                                        newsListProgressBar.visibility = View.VISIBLE
-                                        noConnectionView.visibility = View.VISIBLE
-                                        errorIcon.visibility = View.INVISIBLE
+                                        newsListProgressBar.visibility = View.GONE
+                                        noConnectionView.visibility = View.GONE
                                         newsListView.visibility = View.GONE
-                                        errorMessage.text = "Server Error - Retrying..."
+
+                                        val builder = AlertDialog.Builder(requireContext())
+
+                                        with(builder)
+                                        {
+                                            setTitle("Error")
+                                            setMessage("Cannot connect to server")
+                                            setPositiveButton("OK") { _, _ -> requireActivity().finish() }
+                                            show()
+                                        }
                                     }
                                 }
                             }
