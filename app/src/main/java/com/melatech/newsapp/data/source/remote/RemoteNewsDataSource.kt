@@ -12,7 +12,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
-import java.io.IOException
 import javax.inject.Inject
 
 class RemoteNewsDataSource @Inject constructor(
@@ -32,7 +31,8 @@ class RemoteNewsDataSource @Inject constructor(
                 else ServerResponse.Success(it)
             } ?: ServerResponse.NoContent
             emit(response)
-        }.retryWithPolicy(retryPolicy)
+        }
+            .retryWithPolicy(retryPolicy)
             .catch { emit(ServerResponse.Failure(it.message)) }
             .shareIn(
                 externalScope,
