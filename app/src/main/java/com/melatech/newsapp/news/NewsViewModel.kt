@@ -19,14 +19,23 @@ import javax.inject.Inject
 class NewsViewModel @Inject constructor(
     repository: INewsRepository,
     private val formatPublishedDateUseCase: FormatPublishedDateUseCase,
-    getConnectionUpdateStatusUseCase: GetConnectionUpdateStatusUseCase,
+    private val getConnectionUpdateStatusUseCase: GetConnectionUpdateStatusUseCase,
 ) : ViewModel() {
 
     private val _newsUiStateFlow: MutableStateFlow<NewsUiState> =
         MutableStateFlow(NewsUiState.Data(emptyList()))
     val newsUiStateFlow: StateFlow<NewsUiState> = _newsUiStateFlow
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            NewsUiState.Data(emptyList())
+        )
 
     init {
+        refreshNews()
+    }
+
+    fun refreshNews() {
         _newsUiStateFlow.value = NewsUiState.Loading
         viewModelScope.launch {
             getConnectionUpdateStatusUseCase.networkStatusFlow
@@ -63,11 +72,6 @@ class NewsViewModel @Inject constructor(
                     is ServerResponse.Failure -> NewsUiState.Error(ErrorType.RETRY_GENERIC_ERROR)
                 }
             }
-            .shareIn(
-                viewModelScope,
-                replay = 1,
-                started = SharingStarted.Lazily
-            )
 }
 
 sealed class NewsUiState {

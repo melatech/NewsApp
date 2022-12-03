@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.melatech.newsapp.R
 import com.melatech.newsapp.news.ErrorType.*
 import com.melatech.newsapp.news.model.ContentUrl
@@ -37,6 +38,7 @@ class NewsFragment : Fragment() {
     private lateinit var errorMessage: TextView
     private lateinit var errorIcon: ImageView
     private lateinit var newsListProgressBar: ProgressBar
+    private lateinit var swipeContainer: SwipeRefreshLayout
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,17 +55,24 @@ class NewsFragment : Fragment() {
         errorMessage = view.findViewById(R.id.error_title)
         errorIcon = view.findViewById(R.id.error_icon)
         newsListProgressBar = view.findViewById(R.id.news_list_progressBar)
+        swipeContainer = view.findViewById(R.id.swipe_container)
         newsListView.adapter = newsAdapter
+
+        swipeContainer.setOnRefreshListener {
+            newsViewModel.refreshNews()
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     newsViewModel.newsUiStateFlow.collect { newsUiState ->
+                        swipeContainer.isRefreshing = false
                         when (newsUiState) {
                             is NewsUiState.Data -> {
                                 newsListProgressBar.visibility = View.GONE
                                 noConnectionView.visibility = View.GONE
                                 newsListView.visibility = View.VISIBLE
+                                swipeContainer.visibility = View.VISIBLE
                                 newsAdapter.submitList(newsUiState.newsList)
                             }
                             is NewsUiState.Error -> {
@@ -74,6 +83,7 @@ class NewsFragment : Fragment() {
                                         errorIcon.visibility = View.VISIBLE
                                         errorIcon.setImageResource(R.drawable.no_news)
                                         newsListView.visibility = View.GONE
+                                        swipeContainer.visibility = View.GONE
                                         errorMessage.text = "No News"
                                     }
                                     NO_NETWORK_ERROR -> {
@@ -82,12 +92,14 @@ class NewsFragment : Fragment() {
                                         errorIcon.visibility = View.VISIBLE
                                         errorIcon.setImageResource(R.drawable.no_internet)
                                         newsListView.visibility = View.GONE
+                                        swipeContainer.visibility = View.GONE
                                         errorMessage.text = "No Internet Connection"
                                     }
                                     RETRY_GENERIC_ERROR -> {
                                         newsListProgressBar.visibility = View.GONE
                                         noConnectionView.visibility = View.GONE
                                         newsListView.visibility = View.GONE
+                                        swipeContainer.visibility = View.GONE
 
                                         val builder = AlertDialog.Builder(requireContext())
 
@@ -105,6 +117,7 @@ class NewsFragment : Fragment() {
                                 newsListProgressBar.visibility = View.VISIBLE
                                 noConnectionView.visibility = View.GONE
                                 newsListView.visibility = View.GONE
+                                swipeContainer.visibility = View.GONE
                             }
                         }
                     }

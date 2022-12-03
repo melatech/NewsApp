@@ -6,12 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".news.NewsFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/news_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_container"
         android:visibility="visible"
-        app:layoutManager="LinearLayoutManager" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/news_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            app:layoutManager="LinearLayoutManager" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <include
         android:layout_width="match_parent"
