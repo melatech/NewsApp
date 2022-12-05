@@ -18,7 +18,7 @@
         android:theme="@style/Theme.NewsApp"
         tools:targetApi="31">
         <activity
-            android:name=".NewsFeedActivity"
+            android:name=".news.NewsFeedActivity"
             android:exported="false"
             android:label="@string/title_activity_news_feed"
             android:theme="@style/Theme.NewsApp">
