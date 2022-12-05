@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.melatech.newsapp.R
 import com.melatech.newsapp.news.ErrorType.*
-import com.melatech.newsapp.news.model.ContentUrl
+import com.melatech.newsapp.news.ui.model.ContentUrl
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

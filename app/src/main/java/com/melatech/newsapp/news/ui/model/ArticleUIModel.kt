@@ -1,4 +1,4 @@
-package com.melatech.newsapp.news.model
+package com.melatech.newsapp.news.ui.model
 
 data class ArticleUIModel(
     val id: Int,

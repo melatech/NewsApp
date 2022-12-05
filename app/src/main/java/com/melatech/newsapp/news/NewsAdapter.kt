@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.melatech.newsapp.R
-import com.melatech.newsapp.news.model.ArticleUIModel
-import com.melatech.newsapp.news.model.ContentUrl
+import com.melatech.newsapp.news.ui.model.ArticleUIModel
+import com.melatech.newsapp.news.ui.model.ContentUrl
 
 class NewsAdapter(private val onContentUrlClick: ContentUrl.() -> Unit) :
     ListAdapter<ArticleUIModel, NewsAdapter.NewsViewHolder>(NewsDiffCallback) {

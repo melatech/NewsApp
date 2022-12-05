@@ -7,7 +7,7 @@ import com.melatech.newsapp.data.source.remote.ServerResponse
 import com.melatech.newsapp.domain.usecase.FormatPublishedDateUseCase
 import com.melatech.newsapp.domain.usecase.GetConnectionUpdateStatusUseCase
 import com.melatech.newsapp.domain.usecase.NetworkStatus
-import com.melatech.newsapp.news.model.ArticleUIModel
+import com.melatech.newsapp.news.ui.model.ArticleUIModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
