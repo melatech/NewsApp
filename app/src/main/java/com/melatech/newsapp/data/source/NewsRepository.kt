@@ -1,14 +1,14 @@
 package com.melatech.newsapp.data.source
 
-import com.melatech.newsapp.data.source.remote.model.ApiResponse
-import retrofit2.Response
+import com.melatech.newsapp.data.source.remote.ServerResponse
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class NewsRepository @Inject constructor(
-    private val dataSource: INewsDataSource
+    dataSource: INewsDataSource,
 ) : INewsRepository {
-
-    override suspend fun getNewsHeadlines(country: String, page: Int): Response<ApiResponse> {
-        return dataSource.getNewsHeadlines(country, page)
-    }
+    override val latestNewsApiResponseFlow: Flow<ServerResponse> =
+        dataSource.latestNewsApiResponseFlow
 }

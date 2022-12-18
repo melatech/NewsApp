@@ -1,8 +1,8 @@
 package com.melatech.newsapp.data.source
 
-import com.melatech.newsapp.data.source.remote.model.ApiResponse
-import retrofit2.Response
+import com.melatech.newsapp.data.source.remote.ServerResponse
+import kotlinx.coroutines.flow.Flow
 
 interface INewsRepository {
-    suspend fun getNewsHeadlines(country: String, page: Int): Response<ApiResponse>
+    val latestNewsApiResponseFlow: Flow<ServerResponse>
 }
