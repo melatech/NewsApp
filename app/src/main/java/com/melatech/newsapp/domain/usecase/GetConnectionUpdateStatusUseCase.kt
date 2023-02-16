@@ -9,6 +9,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 
+//implement a reactive solution
 class GetConnectionUpdateStatusUseCase @Inject constructor(@ApplicationContext context: Context) {
 
     private val connectivityManager =
